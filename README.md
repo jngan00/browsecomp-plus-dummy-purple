@@ -8,12 +8,13 @@ Use this to test the green → purple pipeline end to end without needing a real
 
 For each task received from the green agent, the dummy purple agent:
 
-1. Waits for the local BM25 index to be ready
-2. Runs a BM25 search locally over the pre-downloaded index
-3. Ignores the retrieval results
-4. Returns `"I don't know."` as the final answer
+1. Runs a BM25 search locally over the pre-baked index
+2. Ignores the retrieval results
+3. Returns `"I don't know."` as the final answer
 
-Any retrieval error (missing index, search failure, timeout) is surfaced in the answer artifact so green can record it in the per-query rewards output.
+The BM25 index is downloaded from HuggingFace and baked into the Docker image at build time. The entrypoint validates it before the server starts.
+
+Any retrieval error at request time (unexpected search failure) is surfaced in the answer artifact so green can record it alongside the dummy answer.
 
 This means it should consistently score `0`, but it still exercises the wiring between green and purple and the local BM25 retrieval stack.
 
@@ -61,13 +62,10 @@ If BM25 retrieval failed, `retrieval_error` contains the error message and `retr
 |----------|----------|-------------|
 | `BM25_INDEX_PATH` | No | Path to the Lucene BM25 index. Defaults to `/data/indexes/bm25` |
 | `DEFAULT_K` | No | Number of hits to return. Defaults to `5` |
-| `HF_TOKEN` | No | HuggingFace token for faster index downloads |
-| `SKIP_INDEX_DOWNLOAD` | No | Set to `true` to skip the BM25 index download. Retrieval returns empty results |
-| `RETRIEVAL_MAX_WAIT_SEC` | No | Max seconds to wait for the index to become ready. Defaults to `180` |
 
 ## Data Requirements
 
-On startup the entrypoint downloads the BM25 index from HuggingFace (`Tevatron/browsecomp-plus-indexes`) into `BM25_INDEX_PATH` (default `/data/indexes/bm25`). If a valid cached index already exists at the path, the download is skipped.
+The BM25 index from HuggingFace (`Tevatron/browsecomp-plus-indexes`) is downloaded into `BM25_INDEX_PATH` (default `/data/indexes/bm25`) at image build time. No network access is required at runtime.
 
 ## Running Locally
 
@@ -87,7 +85,7 @@ docker run -p 9009:9009 browsecomp-plus-dummy-purple
 
 ## Amber Manifest
 
-The Amber manifest exposes one A2A endpoint and accepts optional `hf_token` and `skip_index_download` config parameters.
+The Amber manifest exposes one A2A endpoint. No config parameters are required.
 
 ## Testing
 
