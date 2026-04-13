@@ -2,9 +2,14 @@
   manifest_version: "0.1.0",
   program: {
     image: "ghcr.io/rdi-foundation/browsecomp-plus-dummy-purple:latest",
-    entrypoint: "uv run --no-sync src/server.py --host 0.0.0.0 --port 9009",
+    entrypoint: "./entrypoint.sh --host 0.0.0.0 --port 9009",
     env: {
       PYTHONUNBUFFERED: "1",
+      // HuggingFace token for faster index downloads.
+      HF_TOKEN: "${config.hf_token}",
+      // Set to "true" to skip the BM25 index download. Retrieval will return
+      // no results, but the agent still exercises the full A2A pipeline.
+      SKIP_INDEX_DOWNLOAD: "${config.skip_index_download}",
     },
     network: {
       endpoints: [
@@ -14,7 +19,10 @@
   },
   config_schema: {
     type: "object",
-    properties: {},
+    properties: {
+      hf_token: { type: "string" },
+      skip_index_download: { type: "string" },
+    },
     required: [],
     additionalProperties: false,
   },

@@ -31,25 +31,28 @@ def _resolve_card_url(explicit_url: str | None, host: str, port: int) -> str:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run the BrowseComp-Plus dummy research agent.")
+    parser = argparse.ArgumentParser(description="Run the BrowseComp-Plus dummy purple agent.")
     parser.add_argument("--host", type=str, default="127.0.0.1")
     parser.add_argument("--port", type=int, default=9009)
     parser.add_argument("--card-url", type=str, help="URL to advertise in the agent card")
     args = parser.parse_args()
 
     skill = AgentSkill(
-        id="browsecomp-plus-research",
-        name="BrowseComp-Plus Research",
-        description="Answers a research question by querying a retrieval agent for relevant documents.",
-        tags=["research", "information-retrieval", "question-answering"],
+        id="browsecomp-plus-dummy",
+        name="BrowseComp-Plus Dummy Research",
+        description=(
+            "Dummy research agent for BrowseComp-Plus. Runs local BM25 retrieval "
+            "to exercise the pipeline, then always returns 'I don't know.'"
+        ),
+        tags=["research", "retrieval", "bm25", "information-retrieval", "question-answering"],
         examples=[],
     )
 
     agent_card = AgentCard(
-        name="BrowseComp-Plus Dummy Research Agent",
+        name="BrowseComp-Plus Dummy Purple Agent",
         description=(
-            "Dummy research agent for BrowseComp-Plus. "
-            "Calls the retrieval agent to exercise the pipeline, then always answers 'I don't know.'"
+            "Dummy purple agent for BrowseComp-Plus that handles research and "
+            "local BM25 retrieval in a single process. Always returns 'I don't know.'"
         ),
         url=_resolve_card_url(args.card_url, args.host, args.port),
         version="1.0.0",

@@ -55,8 +55,15 @@ class Executor(AgentExecutor):
             if not updater._terminal_state_reached:
                 await updater.complete()
         except Exception as e:
-            print(f"Task failed with agent error: {e}")
-            await updater.failed(new_agent_text_message(f"Agent error: {e}", context_id=context_id, task_id=task.id))
+            error_text = f"{type(e).__name__}: {e}"
+            print(f"Task failed with agent error: {error_text}")
+            await updater.failed(
+                new_agent_text_message(
+                    f"Agent error: {error_text}",
+                    context_id=context_id,
+                    task_id=task.id,
+                )
+            )
 
     async def cancel(self, context: RequestContext, event_queue: EventQueue) -> None:
         raise ServerError(error=UnsupportedOperationError())

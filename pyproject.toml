@@ -1,13 +1,35 @@
 [project]
 name = "browsecomp-plus-dummy-purple"
 version = "0.1.0"
-description = "Dummy purple agent for the BrowseComp-Plus benchmark"
+description = "Dummy purple agent for the BrowseComp-Plus benchmark (research + local BM25 retrieval)"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "a2a-sdk[http-server]>=0.3.20",
     "uvicorn>=0.38.0",
-    "httpx>=0.28.1",
+    "pyserini>=0.43.0,<1.6.0",
+    "huggingface-hub>=0.28.0",
+]
+
+[tool.uv]
+# Pyserini pulls in torch with CUDA (~6.7 GB). BM25 retrieval only needs
+# CPU torch, so we override via the PyTorch CPU-only index.
+extra-index-url = ["https://download.pytorch.org/whl/cpu"]
+override-dependencies = [
+    "torch>=2.0.0",
+    "nvidia-cublas-cu12 ; python_version < '0'",
+    "nvidia-cuda-cupti-cu12 ; python_version < '0'",
+    "nvidia-cuda-nvrtx-cu12 ; python_version < '0'",
+    "nvidia-cuda-runtime-cu12 ; python_version < '0'",
+    "nvidia-cudnn-cu12 ; python_version < '0'",
+    "nvidia-cufft-cu12 ; python_version < '0'",
+    "nvidia-curand-cu12 ; python_version < '0'",
+    "nvidia-cusolver-cu12 ; python_version < '0'",
+    "nvidia-cusparse-cu12 ; python_version < '0'",
+    "nvidia-nccl-cu12 ; python_version < '0'",
+    "nvidia-nvjitlink-cu12 ; python_version < '0'",
+    "nvidia-nvtx-cu12 ; python_version < '0'",
+    "triton ; python_version < '0'",
 ]
 
 [project.optional-dependencies]
